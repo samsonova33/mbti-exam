@@ -1,266 +1,444 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>MBTI IT-Анализ | Приём результатов теста</title>
+    <title>MBTI · IT Personality Lab</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', 'Roboto', 'Georgia', serif;
+            font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+        }
+
+        :root {
+            --bg-1: #0f0c29;
+            --bg-2: #302b63;
+            --bg-3: #24243e;
+            --accent: #00f0ff;
+            --accent-2: #ff00e5;
+            --accent-3: #7b61ff;
+            --glass: rgba(255, 255, 255, 0.07);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --text: #f0f4ff;
+            --text-dim: #a0a8c0;
         }
 
         body {
-            background: #eef2fb;
+            background: linear-gradient(135deg, var(--bg-1), var(--bg-2), var(--bg-3));
+            background-size: 400% 400%;
+            animation: bgShift 20s ease infinite;
             min-height: 100vh;
-            padding: 20px;
+            padding: 24px 16px;
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        @keyframes bgShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(0,240,255,0.15), transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(255,0,229,0.12), transparent 40%);
+            pointer-events: none;
+            z-index: 0;
+            animation: float 15s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0,0); }
+            50% { transform: translate(-30px, 30px); }
         }
 
         .container {
             max-width: 1100px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
 
-        .card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-            margin-bottom: 24px;
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow:
+                0 8px 32px rgba(0,0,0,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.1);
             overflow: hidden;
-            border: 1px solid #cfdfed;
+            margin-bottom: 24px;
+            animation: fadeUp 0.6s ease;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .card-header {
-            background: #1a3e6f;
-            color: white;
-            padding: 20px 28px;
+            padding: 28px 32px;
+            border-bottom: 1px solid var(--glass-border);
+            background: linear-gradient(90deg, rgba(0,240,255,0.05), rgba(255,0,229,0.05));
+            position: relative;
+        }
+
+        .card-header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; left: 0;
+            width: 100%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), var(--accent-2), transparent);
         }
 
         .card-header h1 {
-            font-size: 1.6rem;
-            font-weight: 600;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
         }
 
         .card-header p {
-            opacity: 0.85;
-            margin-top: 6px;
+            color: var(--text-dim);
+            margin-top: 8px;
+            font-size: 0.95rem;
         }
 
         .card-body {
-            padding: 28px 32px;
+            padding: 32px;
         }
 
-        .qr-section {
+        h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text);
             display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
-            justify-content: center;
             align-items: center;
-            background: #f8fafd;
-            border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 20px;
+            gap: 8px;
+        }
+
+        h3::before {
+            content: '';
+            width: 4px; height: 18px;
+            background: linear-gradient(180deg, var(--accent), var(--accent-2));
+            border-radius: 2px;
+        }
+
+        /* Форма регистрации */
+        .register-form {
+            display: grid;
+            gap: 16px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0,240,255,0.2);
+            background: rgba(0,0,0,0.4);
+        }
+
+        .form-input::placeholder {
+            color: rgba(160,168,192,0.5);
+        }
+
+        /* QR блок */
+        .qr-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
         }
 
         .qr-box {
             text-align: center;
+            padding: 24px;
+            background: rgba(0,0,0,0.25);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
         }
 
         .qr-canvas {
             background: white;
-            padding: 15px;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        canvas {
-            display: block;
-            margin: 0 auto;
-        }
-
-        .code-input-area {
-            flex: 1;
-            min-width: 250px;
-        }
-
-        .code-input-area input {
-            width: 100%;
-            padding: 14px;
-            font-size: 1.2rem;
-            text-align: center;
-            letter-spacing: 2px;
-            border: 2px solid #c5d5e8;
-            border-radius: 12px;
-            font-family: monospace;
-        }
-
-        .code-input-area button {
-            margin-top: 12px;
-            width: 100%;
             padding: 12px;
-            background: #2c5a9e;
+            border-radius: 16px;
+            display: inline-block;
+            box-shadow: 0 0 30px rgba(0,240,255,0.3);
+        }
+
+        .student-id {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            background: linear-gradient(90deg, var(--accent-3), var(--accent-2));
             color: white;
+            padding: 8px 18px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 12px;
+            box-shadow: 0 4px 16px rgba(123,97,255,0.4);
+        }
+
+        /* Кнопки */
+        .btn {
+            padding: 14px 28px;
             border: none;
-            border-radius: 40px;
+            border-radius: 12px;
             font-weight: 600;
+            font-size: 0.95rem;
             cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            font-family: inherit;
         }
 
-        .type-selector {
-            margin: 20px 0;
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-3));
+            color: #0a0a1f;
+            box-shadow: 0 4px 16px rgba(0,240,255,0.3);
         }
 
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,240,255,0.5);
+        }
+
+        .btn-secondary {
+            background: var(--glass);
+            color: var(--text);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.12);
+            border-color: var(--accent);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff4757, #ff00e5);
+            color: white;
+        }
+
+        .btn-full {
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        /* Типы MBTI */
         .type-buttons {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
             gap: 10px;
-            margin-top: 12px;
+            margin-top: 16px;
         }
 
         .type-btn {
-            padding: 10px;
-            background: #eef2f7;
-            border: 1px solid #c5d5e8;
-            border-radius: 40px;
+            padding: 14px 8px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
             cursor: pointer;
-            font-weight: 600;
+            font-weight: 700;
             text-align: center;
-            transition: all 0.2s;
+            transition: all 0.25s;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+        }
+
+        .type-btn:hover {
+            border-color: var(--accent);
+            color: var(--text);
+            transform: translateY(-2px);
         }
 
         .type-btn.selected {
-            background: #2c5a9e;
+            background: linear-gradient(135deg, var(--accent-3), var(--accent-2));
             color: white;
-            border-color: #2c5a9e;
+            border-color: transparent;
+            box-shadow: 0 4px 20px rgba(123,97,255,0.5);
+            transform: translateY(-2px);
         }
 
+        /* Скриншот */
         .screenshot-area {
-            margin: 24px 0;
-            padding: 20px;
-            background: #f8fafd;
+            padding: 24px;
+            background: rgba(0,0,0,0.25);
+            border: 1px dashed var(--glass-border);
             border-radius: 16px;
             text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .screenshot-area input[type="file"] {
+            margin-top: 12px;
+            color: var(--text-dim);
         }
 
         .screenshot-preview {
             max-width: 100%;
-            max-height: 300px;
+            max-height: 320px;
             margin-top: 16px;
             border-radius: 12px;
-            border: 1px solid #cfdfed;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
         }
 
+        /* Вопросы */
         .analysis-question {
-            background: #fafcff;
+            background: rgba(0,0,0,0.25);
             padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #dde6f2;
+            border-radius: 14px;
+            margin-bottom: 16px;
+            border: 1px solid var(--glass-border);
+            border-left: 3px solid var(--accent);
+            transition: all 0.3s;
+        }
+
+        .analysis-question:hover {
+            border-left-color: var(--accent-2);
+            background: rgba(0,0,0,0.35);
         }
 
         .analysis-question label {
-            font-weight: bold;
+            font-weight: 600;
             display: block;
             margin-bottom: 10px;
+            color: var(--text);
+            font-size: 0.95rem;
         }
 
         textarea {
             width: 100%;
-            padding: 12px;
-            border-radius: 12px;
-            border: 1px solid #c5d5e8;
-            font-size: 0.9rem;
+            padding: 12px 14px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 0.92rem;
             resize: vertical;
             font-family: inherit;
+            min-height: 80px;
         }
 
-        button {
-            background: #eef2f7;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 40px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(0,240,255,0.15);
         }
 
-        button.primary {
-            background: #2c5a9e;
-            color: white;
+        /* Бейдж */
+        .info-badge {
+            background: linear-gradient(135deg, rgba(0,240,255,0.08), rgba(255,0,229,0.08));
+            padding: 18px 22px;
+            border-radius: 14px;
+            margin-top: 20px;
+            border: 1px solid var(--glass-border);
+            border-left: 3px solid var(--accent);
         }
 
-        button.primary:hover {
-            background: #1f4070;
+        .info-badge strong {
+            color: var(--accent);
         }
 
-        button.secondary {
-            background: #e2eaf3;
-            border: 1px solid #c5d5e8;
+        .info-badge ol {
+            margin-left: 20px;
+            margin-top: 10px;
+            color: var(--text-dim);
+            line-height: 1.8;
         }
 
         .nav-buttons {
             display: flex;
-            justify-content: space-between;
-            gap: 16px;
-            margin-top: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 28px;
         }
 
-        .info-badge {
-            background: #e8f0fe;
-            padding: 12px 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            border-left: 4px solid #2c5a9e;
+        .nav-buttons .btn {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .user-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin-top: 12px;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+        }
+
+        .user-tag {
+            background: rgba(0,0,0,0.3);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
         }
 
         footer {
             text-align: center;
             padding: 20px;
-            color: #6c86a3;
-            font-size: 0.75rem;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .student-id {
-            font-family: monospace;
-            font-size: 1.2rem;
-            background: #1a3e6f;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 40px;
-            display: inline-block;
+            color: var(--text-dim);
+            font-size: 0.78rem;
         }
 
         @media (max-width: 700px) {
-            .card-body {
-                padding: 20px;
-            }
-            .type-buttons {
-                grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-            }
+            .card-body { padding: 22px; }
+            .qr-section { grid-template-columns: 1fr; }
+            .card-header h1 { font-size: 1.4rem; }
+            .type-buttons { grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); }
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 </head>
 <body>
-<div class="container" id="app">
-    <!-- динамический рендер -->
-</div>
+<div class="container" id="app"></div>
 
 <script>
     // ====================== СОСТОЯНИЕ ======================
-    let currentStudentId = null;        // ID студента (6 цифр)
-    let studentData = null;              // { type, screenshotBase64, analysisAnswers, timestamp }
+    let currentStudentId = null;
+    let studentData = null;
     let selectedType = null;
     let screenshotData = null;
     let analysisAnswers = new Array(10).fill("");
-    
-    // Вопросы для анализа
+    let studentName = "";
+    let studentGroup = "";
+
     const analysisQuestions = [
         "1. Опишите 3 сильные стороны вашего типа личности в IT-работе (решение сложных задач, коммуникация).",
         "2. Какие слабые стороны вашего типа могут мешать в команде разработки?",
@@ -273,10 +451,9 @@
         "9. Какие методы мотивации для вас наиболее эффективны?",
         "10. Какую ценность вы принесёте IT-команде как лидер или как эксперт?"
     ];
-    
-    // Описания типов MBTI
+
     const typeDescriptions = {
-        "INTJ": "INTJ (Стратег). Аналитический склад ума, системное мышление, ориентация на долгосрочные цели. В IT проявляет себя как архитектор решений.",
+        "INTJ": "INTJ (Стратег). Аналитический склад ума, системное мышление, ориентация на долгосрочные цели. В IT — архитектор решений.",
         "INTP": "INTP (Учёный). Любопытство, поиск новых моделей, склонность к теории. Силён в исследованиях и алгоритмизации.",
         "ENTJ": "ENTJ (Командир). Лидерские качества, стратегическое видение, эффективное управление ресурсами.",
         "ENTP": "ENTP (Новатор). Генерация идей, интеллектуальные дискуссии, гибкость в подходах.",
@@ -293,13 +470,11 @@
         "ESTP": "ESTP (Делец). Энергия, прагматизм, быстрое принятие решений в динамичной среде.",
         "ESFP": "ESFP (Аниматор). Жизнерадостность, адаптивность, умение вовлекать других."
     };
-    
-    // Генерация случайного 6-значного ID
+
     function generateStudentId() {
         return Math.floor(100000 + Math.random() * 900000).toString();
     }
-    
-    // Загрузка данных из localStorage
+
     function loadStudentData(id) {
         const key = `mbti_student_${id}`;
         const raw = localStorage.getItem(key);
@@ -310,17 +485,20 @@
                 selectedType = data.type;
                 screenshotData = data.screenshotBase64;
                 analysisAnswers = data.analysisAnswers || new Array(10).fill("");
+                studentName = data.name || "";
+                studentGroup = data.group || "";
                 return true;
             } catch(e) { return false; }
         }
         return false;
     }
-    
-    // Сохранение данных студента
+
     function saveStudentData() {
         if (!currentStudentId) return;
         const key = `mbti_student_${currentStudentId}`;
         const data = {
+            name: studentName,
+            group: studentGroup,
             type: selectedType,
             screenshotBase64: screenshotData,
             analysisAnswers: analysisAnswers,
@@ -329,58 +507,39 @@
         localStorage.setItem(key, JSON.stringify(data));
         studentData = data;
     }
-    
-    // Создание QR-кода
-    function generateQRCode(containerId, studentId) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
-        container.innerHTML = "";
-        const pageUrl = `${window.location.origin}${window.location.pathname}?id=${studentId}`;
-        new QRCode(container, {
-            text: pageUrl,
-            width: 180,
-            height: 180,
-            colorDark: "#1a3e6f",
-            colorLight: "#ffffff",
-            correctLevel: QRCode.CorrectLevel.H
-        });
-    }
-    
-    // Экспорт отчёта
+
     function exportReport() {
         if (!selectedType) {
             alert("Пожалуйста, выберите ваш тип личности из списка.");
             return;
         }
-        
         let content = "ОТЧЁТ ПО MBTI И IT-АНАЛИЗУ\n";
         content += "==========================================\n";
+        content += `ФИО: ${studentName || "не указано"}\n`;
+        content += `Группа: ${studentGroup || "не указано"}\n`;
         content += `ID студента: ${currentStudentId}\n`;
         content += `Дата и время: ${new Date().toLocaleString()}\n`;
         content += `Результат MBTI: ${selectedType}\n`;
         content += `Описание типа:\n${typeDescriptions[selectedType] || "Нет описания"}\n\n`;
         content += "---- ПИСЬМЕННЫЙ АНАЛИЗ (10 вопросов) ----\n\n";
-        
         for(let i = 0; i < analysisQuestions.length; i++) {
             content += `${analysisQuestions[i]}:\n${analysisAnswers[i] || "не заполнено"}\n\n`;
         }
-        
         content += "---- ПРИМЕЧАНИЕ ----\n";
         content += "Скриншот результата официального MBTI-теста должен быть приложен отдельно.\n";
-        content += "Данный отчёт сформирован на основе самостоятельного выбора типа.\n";
-        
+
         const blob = new Blob([content], {type: "text/plain;charset=utf-8"});
         const link = document.createElement("a");
         const url = URL.createObjectURL(blob);
         link.href = url;
-        link.download = `MBTI_Report_${currentStudentId}_${selectedType}.txt`;
+        const safeName = (studentName || "student").replace(/\s+/g, "_");
+        link.download = `MBTI_${safeName}_${currentStudentId}_${selectedType}.txt`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
     }
-    
-    // Обработка загрузки скриншота
+
     function handleScreenshotUpload(file) {
         if (!file) return;
         const reader = new FileReader();
@@ -391,83 +550,73 @@
         };
         reader.readAsDataURL(file);
     }
-    
-    // Сохранение анализа из textarea
-    function saveAnalysisFromInputs() {
-        for(let i = 0; i < analysisQuestions.length; i++) {
-            const ta = document.getElementById(`ana_${i}`);
-            if(ta) analysisAnswers[i] = ta.value;
-        }
-        saveStudentData();
-        alert("Анализ сохранён!");
-    }
-    
-    // Отрисовка главного экрана (QR / вход)
-    function renderLoginScreen() {
+
+    // ====================== ЭКРАН 1: РЕГИСТРАЦИЯ (ФИО + группа) ======================
+    function renderRegisterScreen() {
         const app = document.getElementById("app");
-        const newStudentId = generateStudentId();
-        
         app.innerHTML = `
-            <div class="card">
+            <div class="glass-card">
                 <div class="card-header">
-                    <h1>MBTI IT-Анализ личности</h1>
-                    <p>Пройдите официальный MBTI-тест (16personalities.com или аналоги), затем прикрепите результат</p>
+                    <h1>⚡ MBTI · IT Personality Lab</h1>
+                    <p>Добро пожаловать! Перед началом введите данные о себе</p>
                 </div>
                 <div class="card-body">
-                    <div class="qr-section">
-                        <div class="qr-box">
-                            <div class="qr-canvas">
-                                <div id="qrcode"></div>
-                            </div>
-                            <p style="margin-top: 12px;">Ваш персональный QR-код</p>
-                            <div class="student-id" style="margin-top: 10px;">ID: ${newStudentId}</div>
+                    <div class="register-form">
+                        <div class="form-group">
+                            <label>ФИО (полностью)</label>
+                            <input type="text" class="form-input" id="inputName" placeholder="Иванов Иван Иванович" autocomplete="off">
                         </div>
-                        <div class="code-input-area">
-                            <p><strong>Или введите код вручную:</strong></p>
-                            <input type="text" id="manualId" placeholder="6-значный код" maxlength="6" pattern="[0-9]{6}">
-                            <button id="enterBtn">Войти по коду</button>
-                            <p style="margin-top: 16px; font-size: 0.85rem; color: #6c86a3;">
-                                Отсканируйте QR-код на телефоне или сохраните ссылку.<br>
-                                После прохождения теста вы сможете вернуться по этому коду.
-                            </p>
+                        <div class="form-group">
+                            <label>Учебная группа</label>
+                            <input type="text" class="form-input" id="inputGroup" placeholder="ИС-21, БИ-3 и т.д." autocomplete="off">
                         </div>
+                        <button class="btn btn-primary btn-full" id="startBtn">Начать → получить QR-код</button>
+
+                        <div style="text-align:center; color: var(--text-dim); font-size:0.85rem; margin: 16px 0 8px;">
+                            — или —
+                        </div>
+
+                        <div class="form-group">
+                            <label>Уже есть код доступа?</label>
+                            <input type="text" class="form-input" id="manualId" placeholder="Введите 6-значный код" maxlength="6">
+                        </div>
+                        <button class="btn btn-secondary btn-full" id="enterBtn">Войти по коду</button>
                     </div>
-                    
+
                     <div class="info-badge">
-                        <strong>Инструкция:</strong>
-                        <ol style="margin-left: 20px; margin-top: 8px;">
-                            <li>Пройдите официальный MBTI-тест на любом сайте (рекомендуется 16personalities.com)</li>
-                            <li>Сделайте скриншот вашего результата (тип личности и описание)</li>
-                            <li>Отсканируйте QR-код или введите ваш ID (${newStudentId})</li>
-                            <li>Прикрепите скриншот, выберите ваш тип и напишите IT-анализ</li>
-                            <li>Экспортируйте готовый отчёт в файл</li>
+                        <strong>Как это работает:</strong>
+                        <ol>
+                            <li>Введите ФИО и группу, нажмите «Начать»</li>
+                            <li>Получите личный QR-код и 6-значный ID</li>
+                            <li>Пройдите MBTI-тест на 16personalities.com</li>
+                            <li>Загрузите скриншот результата и заполните анализ</li>
+                            <li>Экспортируйте готовый отчёт</li>
                         </ol>
                     </div>
                 </div>
-                <footer>
-                    Академический проект · Самостоятельное подтверждение типа MBTI
-                </footer>
+                <footer>Академический проект · Данные хранятся локально в браузере</footer>
             </div>
         `;
-        
-        // Генерируем QR для нового ID
-        setTimeout(() => {
-            const pageUrl = `${window.location.origin}${window.location.pathname}?id=${newStudentId}`;
-            const qrContainer = document.getElementById("qrcode");
-            if (qrContainer) {
-                qrContainer.innerHTML = "";
-                new QRCode(qrContainer, {
-                    text: pageUrl,
-                    width: 180,
-                    height: 180,
-                    colorDark: "#1a3e6f",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.H
-                });
+
+        document.getElementById("startBtn").addEventListener("click", () => {
+            const name = document.getElementById("inputName").value.trim();
+            const group = document.getElementById("inputGroup").value.trim();
+            if (!name || !group) {
+                alert("Пожалуйста, заполните ФИО и группу");
+                return;
             }
-        }, 100);
-        
-        document.getElementById("enterBtn")?.addEventListener("click", () => {
+            studentName = name;
+            studentGroup = group;
+            const newId = generateStudentId();
+            currentStudentId = newId;
+            saveStudentData();
+            const url = new URL(window.location);
+            url.searchParams.set("id", newId);
+            window.history.pushState({}, "", url);
+            renderAnalysisView();
+        });
+
+        document.getElementById("enterBtn").addEventListener("click", () => {
             const id = document.getElementById("manualId").value.trim();
             if (id && /^\d{6}$/.test(id)) {
                 window.location.href = `?id=${id}`;
@@ -475,29 +624,22 @@
                 alert("Введите корректный 6-значный код");
             }
         });
-        
-        // Сохраняем сгенерированный ID в URL без перезагрузки
-        const url = new URL(window.location);
-        url.searchParams.set("id", newStudentId);
-        window.history.pushState({}, "", url);
-        currentStudentId = newStudentId;
-        saveStudentData();
     }
-    
-    // Отрисовка страницы анализа (после входа)
+
+    // ====================== ЭКРАН 2: АНАЛИЗ ======================
     function renderAnalysisView() {
         const app = document.getElementById("app");
         const typeList = ["INTJ","INTP","ENTJ","ENTP","INFJ","INFP","ENFJ","ENFP","ISTJ","ISFJ","ESTJ","ESFJ","ISTP","ISFP","ESTP","ESFP"];
-        
+
         let typeButtonsHtml = "";
         typeList.forEach(t => {
             typeButtonsHtml += `<div class="type-btn ${selectedType === t ? 'selected' : ''}" data-type="${t}">${t}</div>`;
         });
-        
-        const screenshotPreviewHtml = screenshotData ? 
-            `<img src="${screenshotData}" class="screenshot-preview" alt="Скриншот результата">` : 
-            `<p style="color: #999;">Скриншот не загружен</p>`;
-        
+
+        const screenshotPreviewHtml = screenshotData ?
+            `<img src="${screenshotData}" class="screenshot-preview" alt="Скриншот">` :
+            `<p style="color: var(--text-dim); margin-top:10px;">📷 Скриншот ещё не загружен</p>`;
+
         let analysisHtml = "";
         for(let i = 0; i < analysisQuestions.length; i++) {
             analysisHtml += `
@@ -507,114 +649,178 @@
                 </div>
             `;
         }
-        
+
         app.innerHTML = `
-            <div class="card">
+            <div class="glass-card">
                 <div class="card-header">
-                    <h1>IT-анализ личности</h1>
-                    <p>Студент ID: <span class="student-id" style="background:#2c5a9e;">${currentStudentId}</span></p>
+                    <h1>⚡ MBTI · Личный кабинет</h1>
+                    <p>Заполните результат теста и проведите IT-анализ</p>
+                    <div class="user-info">
+                        <span class="user-tag">👤 ${studentName || "Без имени"}</span>
+                        <span class="user-tag">🎓 ${studentGroup || "—"}</span>
+                        <span class="student-id">ID: ${currentStudentId}</span>
+                    </div>
                 </div>
                 <div class="card-body">
-                    <div class="screenshot-area">
-                        <h3>Скриншот результата MBTI-теста</h3>
-                        <p style="font-size: 0.85rem; margin-bottom: 12px;">Загрузите скриншот с официального сайта (16personalities.com и т.д.)</p>
-                        <input type="file" id="screenshotInput" accept="image/*" capture="environment">
-                        <div id="screenshotPreview">${screenshotPreviewHtml}</div>
-                    </div>
-                    
-                    <div class="type-selector">
-                        <h3>Выберите ваш тип личности (из скриншота)</h3>
-                        <div class="type-buttons" id="typeButtons">
-                            ${typeButtonsHtml}
+
+                    <div class="qr-section">
+                        <div class="qr-box">
+                            <div class="qr-canvas"><div id="qrcode"></div></div>
+                            <div style="margin-top: 12px; color: var(--text-dim); font-size:0.85rem;">QR для возврата к сессии</div>
+                        </div>
+                        <div class="screenshot-area">
+                            <h3>Скриншот MBTI-теста</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 12px;">Загрузите изображение с результатом</p>
+                            <input type="file" id="screenshotInput" accept="image/*" capture="environment">
+                            <div id="screenshotPreview">${screenshotPreviewHtml}</div>
                         </div>
                     </div>
-                    
-                    <div style="margin: 24px 0;">
+
+                    <div style="margin: 28px 0;">
+                        <h3>Ваш тип личности</h3>
+                        <div class="type-buttons">${typeButtonsHtml}</div>
+                    </div>
+
+                    <div class="info-badge">
+                        <strong>Описание типа:</strong><br>
+                        <span style="color: var(--text);">${selectedType ? typeDescriptions[selectedType] : "Выберите тип из списка выше"}</span>
+                    </div>
+
+                    <div style="margin: 32px 0 16px;">
                         <h3>Письменный IT-анализ</h3>
-                        <p style="font-size: 0.85rem; color: #6c86a3; margin-bottom: 16px;">Опишите, как ваш тип проявляется в IT-работе, лидерские качества и т.д.</p>
+                        <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 16px;">Опишите, как ваш тип проявляется в IT-работе</p>
                         ${analysisHtml}
                     </div>
-                    
+
                     <div class="nav-buttons">
-                        <button class="primary" id="saveAnalysisBtn">Сохранить анализ</button>
-                        <button class="primary" id="exportBtn">Экспортировать отчёт (TXT)</button>
-                        <button class="secondary" id="logoutBtn">Выйти / другой студент</button>
-                    </div>
-                    
-                    <div class="info-badge" style="margin-top: 24px;">
-                        <strong>Описание вашего типа (справка):</strong><br>
-                        ${selectedType ? typeDescriptions[selectedType] : "Выберите тип из списка выше"}
+                        <button class="btn btn-secondary" id="saveAnalysisBtn">💾 Сохранить</button>
+                        <button class="btn btn-primary" id="exportBtn">📤 Экспортировать TXT</button>
+                        <button class="btn btn-danger" id="logoutBtn">↩ Выйти</button>
                     </div>
                 </div>
-                <footer>
-                    Честность студента: вы подтверждаете, что проходили официальный MBTI-тест.<br>
-                    Скриншот сохраняется локально и не передаётся на сервер.
-                </footer>
+                <footer>Данные сохраняются локально · Скриншот не передаётся на сервер</footer>
             </div>
         `;
-        
-        // Обработка выбора типа
+
+        // QR
+        setTimeout(() => {
+            const pageUrl = `${window.location.origin}${window.location.pathname}?id=${currentStudentId}`;
+            const qrContainer = document.getElementById("qrcode");
+            if (qrContainer) {
+                qrContainer.innerHTML = "";
+                new QRCode(qrContainer, {
+                    text: pageUrl,
+                    width: 160,
+                    height: 160,
+                    colorDark: "#0f0c29",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            }
+        }, 50);
+
         document.querySelectorAll(".type-btn").forEach(btn => {
             btn.addEventListener("click", () => {
+                // сохраним текущие ответы перед перерисовкой
+                for(let i = 0; i < analysisQuestions.length; i++) {
+                    const ta = document.getElementById(`ana_${i}`);
+                    if(ta) analysisAnswers[i] = ta.value;
+                }
                 selectedType = btn.dataset.type;
                 saveStudentData();
-                renderAnalysisView(); // обновляем для отображения описания и выделения
+                renderAnalysisView();
             });
         });
-        
-        // Загрузка скриншота
+
         document.getElementById("screenshotInput")?.addEventListener("change", (e) => {
-            if (e.target.files && e.target.files[0]) {
-                handleScreenshotUpload(e.target.files[0]);
-            }
+            if (e.target.files && e.target.files[0]) handleScreenshotUpload(e.target.files[0]);
         });
-        
-        // Сохранение анализа
+
         document.getElementById("saveAnalysisBtn")?.addEventListener("click", () => {
             for(let i = 0; i < analysisQuestions.length; i++) {
                 const ta = document.getElementById(`ana_${i}`);
                 if(ta) analysisAnswers[i] = ta.value;
             }
             saveStudentData();
-            alert("Анализ сохранён!");
+            alert("✓ Анализ сохранён!");
         });
-        
-        // Экспорт
-        document.getElementById("exportBtn")?.addEventListener("click", exportReport);
-        
-        // Выход
+
+        document.getElementById("exportBtn")?.addEventListener("click", () => {
+            for(let i = 0; i < analysisQuestions.length; i++) {
+                const ta = document.getElementById(`ana_${i}`);
+                if(ta) analysisAnswers[i] = ta.value;
+            }
+            saveStudentData();
+            exportReport();
+        });
+
         document.getElementById("logoutBtn")?.addEventListener("click", () => {
-            if(confirm("Выйти и очистить текущую сессию? Данные сохранятся по вашему ID.")) {
+            if(confirm("Выйти из текущей сессии? Данные сохранятся по вашему ID.")) {
                 window.location.href = window.location.pathname;
             }
         });
     }
-    
+
     // ====================== ИНИЦИАЛИЗАЦИЯ ======================
     function init() {
         const urlParams = new URLSearchParams(window.location.search);
         const idFromUrl = urlParams.get("id");
-        
+
         if (idFromUrl && /^\d{6}$/.test(idFromUrl)) {
             currentStudentId = idFromUrl;
             if (loadStudentData(currentStudentId)) {
-                selectedType = studentData.type;
-                screenshotData = studentData.screenshotBase64;
-                analysisAnswers = studentData.analysisAnswers || new Array(10).fill("");
-                renderAnalysisView();
+                // если ФИО/группа не заполнены — попросим
+                if (!studentName || !studentGroup) {
+                    askForNameGroupThenAnalysis();
+                } else {
+                    renderAnalysisView();
+                }
             } else {
-                // Новый студент с этим ID
-                selectedType = null;
-                screenshotData = null;
-                analysisAnswers = new Array(10).fill("");
-                saveStudentData();
-                renderAnalysisView();
+                // Новый ID, но без данных — попросим ФИО/группу
+                askForNameGroupThenAnalysis();
             }
         } else {
-            renderLoginScreen();
+            renderRegisterScreen();
         }
     }
-    
+
+    function askForNameGroupThenAnalysis() {
+        const app = document.getElementById("app");
+        app.innerHTML = `
+            <div class="glass-card">
+                <div class="card-header">
+                    <h1>⚡ Завершите регистрацию</h1>
+                    <p>Укажите ФИО и группу для входа в сессию ID: ${currentStudentId}</p>
+                </div>
+                <div class="card-body">
+                    <div class="register-form">
+                        <div class="form-group">
+                            <label>ФИО (полностью)</label>
+                            <input type="text" class="form-input" id="inputName" value="${studentName || ''}" placeholder="Иванов Иван Иванович">
+                        </div>
+                        <div class="form-group">
+                            <label>Учебная группа</label>
+                            <input type="text" class="form-input" id="inputGroup" value="${studentGroup || ''}" placeholder="ИС-21">
+                        </div>
+                        <button class="btn btn-primary btn-full" id="continueBtn">Продолжить →</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.getElementById("continueBtn").addEventListener("click", () => {
+            const name = document.getElementById("inputName").value.trim();
+            const group = document.getElementById("inputGroup").value.trim();
+            if (!name || !group) {
+                alert("Заполните ФИО и группу");
+                return;
+            }
+            studentName = name;
+            studentGroup = group;
+            saveStudentData();
+            renderAnalysisView();
+        });
+    }
+
     init();
 </script>
 </body>
