@@ -1,0 +1,621 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>MBTI IT-Анализ | Приём результатов теста</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Roboto', 'Georgia', serif;
+        }
+
+        body {
+            background: #eef2fb;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            margin-bottom: 24px;
+            overflow: hidden;
+            border: 1px solid #cfdfed;
+        }
+
+        .card-header {
+            background: #1a3e6f;
+            color: white;
+            padding: 20px 28px;
+        }
+
+        .card-header h1 {
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
+
+        .card-header p {
+            opacity: 0.85;
+            margin-top: 6px;
+        }
+
+        .card-body {
+            padding: 28px 32px;
+        }
+
+        .qr-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            align-items: center;
+            background: #f8fafd;
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .qr-box {
+            text-align: center;
+        }
+
+        .qr-canvas {
+            background: white;
+            padding: 15px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .code-input-area {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .code-input-area input {
+            width: 100%;
+            padding: 14px;
+            font-size: 1.2rem;
+            text-align: center;
+            letter-spacing: 2px;
+            border: 2px solid #c5d5e8;
+            border-radius: 12px;
+            font-family: monospace;
+        }
+
+        .code-input-area button {
+            margin-top: 12px;
+            width: 100%;
+            padding: 12px;
+            background: #2c5a9e;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .type-selector {
+            margin: 20px 0;
+        }
+
+        .type-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .type-btn {
+            padding: 10px;
+            background: #eef2f7;
+            border: 1px solid #c5d5e8;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .type-btn.selected {
+            background: #2c5a9e;
+            color: white;
+            border-color: #2c5a9e;
+        }
+
+        .screenshot-area {
+            margin: 24px 0;
+            padding: 20px;
+            background: #f8fafd;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .screenshot-preview {
+            max-width: 100%;
+            max-height: 300px;
+            margin-top: 16px;
+            border-radius: 12px;
+            border: 1px solid #cfdfed;
+        }
+
+        .analysis-question {
+            background: #fafcff;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #dde6f2;
+        }
+
+        .analysis-question label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #c5d5e8;
+            font-size: 0.9rem;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        button {
+            background: #eef2f7;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button.primary {
+            background: #2c5a9e;
+            color: white;
+        }
+
+        button.primary:hover {
+            background: #1f4070;
+        }
+
+        button.secondary {
+            background: #e2eaf3;
+            border: 1px solid #c5d5e8;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .info-badge {
+            background: #e8f0fe;
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2c5a9e;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #6c86a3;
+            font-size: 0.75rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .student-id {
+            font-family: monospace;
+            font-size: 1.2rem;
+            background: #1a3e6f;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 40px;
+            display: inline-block;
+        }
+
+        @media (max-width: 700px) {
+            .card-body {
+                padding: 20px;
+            }
+            .type-buttons {
+                grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+<div class="container" id="app">
+    <!-- динамический рендер -->
+</div>
+
+<script>
+    // ====================== СОСТОЯНИЕ ======================
+    let currentStudentId = null;        // ID студента (6 цифр)
+    let studentData = null;              // { type, screenshotBase64, analysisAnswers, timestamp }
+    let selectedType = null;
+    let screenshotData = null;
+    let analysisAnswers = new Array(10).fill("");
+    
+    // Вопросы для анализа
+    const analysisQuestions = [
+        "1. Опишите 3 сильные стороны вашего типа личности в IT-работе (решение сложных задач, коммуникация).",
+        "2. Какие слабые стороны вашего типа могут мешать в команде разработки?",
+        "3. Обладаете ли вы лидерскими качествами согласно вашему типу? Приведите пример.",
+        "4. Как вы принимаете решения в стрессовой ситуации на проекте?",
+        "5. Насколько вы склонны к самоорганизации и дедлайнам?",
+        "6. Опишите идеальную IT-роль для вашего типа (backend, frontend, аналитик, PM).",
+        "7. Легко ли вам воспринимать обратную связь от коллег?",
+        "8. Как ваш тип помогает в разработке сложного алгоритма?",
+        "9. Какие методы мотивации для вас наиболее эффективны?",
+        "10. Какую ценность вы принесёте IT-команде как лидер или как эксперт?"
+    ];
+    
+    // Описания типов MBTI
+    const typeDescriptions = {
+        "INTJ": "INTJ (Стратег). Аналитический склад ума, системное мышление, ориентация на долгосрочные цели. В IT проявляет себя как архитектор решений.",
+        "INTP": "INTP (Учёный). Любопытство, поиск новых моделей, склонность к теории. Силён в исследованиях и алгоритмизации.",
+        "ENTJ": "ENTJ (Командир). Лидерские качества, стратегическое видение, эффективное управление ресурсами.",
+        "ENTP": "ENTP (Новатор). Генерация идей, интеллектуальные дискуссии, гибкость в подходах.",
+        "INFJ": "INFJ (Заступник). Эмпатия, глубокая интуиция, стремление помогать развитию команды.",
+        "INFP": "INFP (Посредник). Ценности, креативность, адаптивность. Создаёт гармонию в коллективе.",
+        "ENFJ": "ENFJ (Наставник). Мотивация других, отличная коммуникация, понимание эмоциональных потребностей.",
+        "ENFP": "ENFP (Борец за идеи). Энтузиазм, широта интересов, вдохновляет на изменения.",
+        "ISTJ": "ISTJ (Администратор). Ответственность, логика, внимание к деталям. Надёжный профессионал.",
+        "ISFJ": "ISFJ (Хранитель). Преданность делу, забота о процессах, стабильность.",
+        "ESTJ": "ESTJ (Управляющий). Порядок, эффективность, практичность. Организует работу.",
+        "ESFJ": "ESFJ (Консул). Социальная ответственность, поддержка традиций, командный дух.",
+        "ISTP": "ISTP (Виртуоз). Техническая смекалка, решение конкретных задач, спокойствие в кризисах.",
+        "ISFP": "ISFP (Художник). Чувствительность, эстетика, ориентация на настоящий момент.",
+        "ESTP": "ESTP (Делец). Энергия, прагматизм, быстрое принятие решений в динамичной среде.",
+        "ESFP": "ESFP (Аниматор). Жизнерадостность, адаптивность, умение вовлекать других."
+    };
+    
+    // Генерация случайного 6-значного ID
+    function generateStudentId() {
+        return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+    
+    // Загрузка данных из localStorage
+    function loadStudentData(id) {
+        const key = `mbti_student_${id}`;
+        const raw = localStorage.getItem(key);
+        if (raw) {
+            try {
+                const data = JSON.parse(raw);
+                studentData = data;
+                selectedType = data.type;
+                screenshotData = data.screenshotBase64;
+                analysisAnswers = data.analysisAnswers || new Array(10).fill("");
+                return true;
+            } catch(e) { return false; }
+        }
+        return false;
+    }
+    
+    // Сохранение данных студента
+    function saveStudentData() {
+        if (!currentStudentId) return;
+        const key = `mbti_student_${currentStudentId}`;
+        const data = {
+            type: selectedType,
+            screenshotBase64: screenshotData,
+            analysisAnswers: analysisAnswers,
+            timestamp: new Date().toISOString()
+        };
+        localStorage.setItem(key, JSON.stringify(data));
+        studentData = data;
+    }
+    
+    // Создание QR-кода
+    function generateQRCode(containerId, studentId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = "";
+        const pageUrl = `${window.location.origin}${window.location.pathname}?id=${studentId}`;
+        new QRCode(container, {
+            text: pageUrl,
+            width: 180,
+            height: 180,
+            colorDark: "#1a3e6f",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    }
+    
+    // Экспорт отчёта
+    function exportReport() {
+        if (!selectedType) {
+            alert("Пожалуйста, выберите ваш тип личности из списка.");
+            return;
+        }
+        
+        let content = "ОТЧЁТ ПО MBTI И IT-АНАЛИЗУ\n";
+        content += "==========================================\n";
+        content += `ID студента: ${currentStudentId}\n`;
+        content += `Дата и время: ${new Date().toLocaleString()}\n`;
+        content += `Результат MBTI: ${selectedType}\n`;
+        content += `Описание типа:\n${typeDescriptions[selectedType] || "Нет описания"}\n\n`;
+        content += "---- ПИСЬМЕННЫЙ АНАЛИЗ (10 вопросов) ----\n\n";
+        
+        for(let i = 0; i < analysisQuestions.length; i++) {
+            content += `${analysisQuestions[i]}:\n${analysisAnswers[i] || "не заполнено"}\n\n`;
+        }
+        
+        content += "---- ПРИМЕЧАНИЕ ----\n";
+        content += "Скриншот результата официального MBTI-теста должен быть приложен отдельно.\n";
+        content += "Данный отчёт сформирован на основе самостоятельного выбора типа.\n";
+        
+        const blob = new Blob([content], {type: "text/plain;charset=utf-8"});
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.href = url;
+        link.download = `MBTI_Report_${currentStudentId}_${selectedType}.txt`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+    
+    // Обработка загрузки скриншота
+    function handleScreenshotUpload(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            screenshotData = e.target.result;
+            saveStudentData();
+            renderAnalysisView();
+        };
+        reader.readAsDataURL(file);
+    }
+    
+    // Сохранение анализа из textarea
+    function saveAnalysisFromInputs() {
+        for(let i = 0; i < analysisQuestions.length; i++) {
+            const ta = document.getElementById(`ana_${i}`);
+            if(ta) analysisAnswers[i] = ta.value;
+        }
+        saveStudentData();
+        alert("Анализ сохранён!");
+    }
+    
+    // Отрисовка главного экрана (QR / вход)
+    function renderLoginScreen() {
+        const app = document.getElementById("app");
+        const newStudentId = generateStudentId();
+        
+        app.innerHTML = `
+            <div class="card">
+                <div class="card-header">
+                    <h1>MBTI IT-Анализ личности</h1>
+                    <p>Пройдите официальный MBTI-тест (16personalities.com или аналоги), затем прикрепите результат</p>
+                </div>
+                <div class="card-body">
+                    <div class="qr-section">
+                        <div class="qr-box">
+                            <div class="qr-canvas">
+                                <div id="qrcode"></div>
+                            </div>
+                            <p style="margin-top: 12px;">Ваш персональный QR-код</p>
+                            <div class="student-id" style="margin-top: 10px;">ID: ${newStudentId}</div>
+                        </div>
+                        <div class="code-input-area">
+                            <p><strong>Или введите код вручную:</strong></p>
+                            <input type="text" id="manualId" placeholder="6-значный код" maxlength="6" pattern="[0-9]{6}">
+                            <button id="enterBtn">Войти по коду</button>
+                            <p style="margin-top: 16px; font-size: 0.85rem; color: #6c86a3;">
+                                Отсканируйте QR-код на телефоне или сохраните ссылку.<br>
+                                После прохождения теста вы сможете вернуться по этому коду.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-badge">
+                        <strong>Инструкция:</strong>
+                        <ol style="margin-left: 20px; margin-top: 8px;">
+                            <li>Пройдите официальный MBTI-тест на любом сайте (рекомендуется 16personalities.com)</li>
+                            <li>Сделайте скриншот вашего результата (тип личности и описание)</li>
+                            <li>Отсканируйте QR-код или введите ваш ID (${newStudentId})</li>
+                            <li>Прикрепите скриншот, выберите ваш тип и напишите IT-анализ</li>
+                            <li>Экспортируйте готовый отчёт в файл</li>
+                        </ol>
+                    </div>
+                </div>
+                <footer>
+                    Академический проект · Самостоятельное подтверждение типа MBTI
+                </footer>
+            </div>
+        `;
+        
+        // Генерируем QR для нового ID
+        setTimeout(() => {
+            const pageUrl = `${window.location.origin}${window.location.pathname}?id=${newStudentId}`;
+            const qrContainer = document.getElementById("qrcode");
+            if (qrContainer) {
+                qrContainer.innerHTML = "";
+                new QRCode(qrContainer, {
+                    text: pageUrl,
+                    width: 180,
+                    height: 180,
+                    colorDark: "#1a3e6f",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            }
+        }, 100);
+        
+        document.getElementById("enterBtn")?.addEventListener("click", () => {
+            const id = document.getElementById("manualId").value.trim();
+            if (id && /^\d{6}$/.test(id)) {
+                window.location.href = `?id=${id}`;
+            } else {
+                alert("Введите корректный 6-значный код");
+            }
+        });
+        
+        // Сохраняем сгенерированный ID в URL без перезагрузки
+        const url = new URL(window.location);
+        url.searchParams.set("id", newStudentId);
+        window.history.pushState({}, "", url);
+        currentStudentId = newStudentId;
+        saveStudentData();
+    }
+    
+    // Отрисовка страницы анализа (после входа)
+    function renderAnalysisView() {
+        const app = document.getElementById("app");
+        const typeList = ["INTJ","INTP","ENTJ","ENTP","INFJ","INFP","ENFJ","ENFP","ISTJ","ISFJ","ESTJ","ESFJ","ISTP","ISFP","ESTP","ESFP"];
+        
+        let typeButtonsHtml = "";
+        typeList.forEach(t => {
+            typeButtonsHtml += `<div class="type-btn ${selectedType === t ? 'selected' : ''}" data-type="${t}">${t}</div>`;
+        });
+        
+        const screenshotPreviewHtml = screenshotData ? 
+            `<img src="${screenshotData}" class="screenshot-preview" alt="Скриншот результата">` : 
+            `<p style="color: #999;">Скриншот не загружен</p>`;
+        
+        let analysisHtml = "";
+        for(let i = 0; i < analysisQuestions.length; i++) {
+            analysisHtml += `
+                <div class="analysis-question">
+                    <label>${analysisQuestions[i]}</label>
+                    <textarea id="ana_${i}" rows="3" placeholder="Напишите развёрнутый ответ...">${analysisAnswers[i] || ""}</textarea>
+                </div>
+            `;
+        }
+        
+        app.innerHTML = `
+            <div class="card">
+                <div class="card-header">
+                    <h1>IT-анализ личности</h1>
+                    <p>Студент ID: <span class="student-id" style="background:#2c5a9e;">${currentStudentId}</span></p>
+                </div>
+                <div class="card-body">
+                    <div class="screenshot-area">
+                        <h3>Скриншот результата MBTI-теста</h3>
+                        <p style="font-size: 0.85rem; margin-bottom: 12px;">Загрузите скриншот с официального сайта (16personalities.com и т.д.)</p>
+                        <input type="file" id="screenshotInput" accept="image/*" capture="environment">
+                        <div id="screenshotPreview">${screenshotPreviewHtml}</div>
+                    </div>
+                    
+                    <div class="type-selector">
+                        <h3>Выберите ваш тип личности (из скриншота)</h3>
+                        <div class="type-buttons" id="typeButtons">
+                            ${typeButtonsHtml}
+                        </div>
+                    </div>
+                    
+                    <div style="margin: 24px 0;">
+                        <h3>Письменный IT-анализ</h3>
+                        <p style="font-size: 0.85rem; color: #6c86a3; margin-bottom: 16px;">Опишите, как ваш тип проявляется в IT-работе, лидерские качества и т.д.</p>
+                        ${analysisHtml}
+                    </div>
+                    
+                    <div class="nav-buttons">
+                        <button class="primary" id="saveAnalysisBtn">Сохранить анализ</button>
+                        <button class="primary" id="exportBtn">Экспортировать отчёт (TXT)</button>
+                        <button class="secondary" id="logoutBtn">Выйти / другой студент</button>
+                    </div>
+                    
+                    <div class="info-badge" style="margin-top: 24px;">
+                        <strong>Описание вашего типа (справка):</strong><br>
+                        ${selectedType ? typeDescriptions[selectedType] : "Выберите тип из списка выше"}
+                    </div>
+                </div>
+                <footer>
+                    Честность студента: вы подтверждаете, что проходили официальный MBTI-тест.<br>
+                    Скриншот сохраняется локально и не передаётся на сервер.
+                </footer>
+            </div>
+        `;
+        
+        // Обработка выбора типа
+        document.querySelectorAll(".type-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                selectedType = btn.dataset.type;
+                saveStudentData();
+                renderAnalysisView(); // обновляем для отображения описания и выделения
+            });
+        });
+        
+        // Загрузка скриншота
+        document.getElementById("screenshotInput")?.addEventListener("change", (e) => {
+            if (e.target.files && e.target.files[0]) {
+                handleScreenshotUpload(e.target.files[0]);
+            }
+        });
+        
+        // Сохранение анализа
+        document.getElementById("saveAnalysisBtn")?.addEventListener("click", () => {
+            for(let i = 0; i < analysisQuestions.length; i++) {
+                const ta = document.getElementById(`ana_${i}`);
+                if(ta) analysisAnswers[i] = ta.value;
+            }
+            saveStudentData();
+            alert("Анализ сохранён!");
+        });
+        
+        // Экспорт
+        document.getElementById("exportBtn")?.addEventListener("click", exportReport);
+        
+        // Выход
+        document.getElementById("logoutBtn")?.addEventListener("click", () => {
+            if(confirm("Выйти и очистить текущую сессию? Данные сохранятся по вашему ID.")) {
+                window.location.href = window.location.pathname;
+            }
+        });
+    }
+    
+    // ====================== ИНИЦИАЛИЗАЦИЯ ======================
+    function init() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const idFromUrl = urlParams.get("id");
+        
+        if (idFromUrl && /^\d{6}$/.test(idFromUrl)) {
+            currentStudentId = idFromUrl;
+            if (loadStudentData(currentStudentId)) {
+                selectedType = studentData.type;
+                screenshotData = studentData.screenshotBase64;
+                analysisAnswers = studentData.analysisAnswers || new Array(10).fill("");
+                renderAnalysisView();
+            } else {
+                // Новый студент с этим ID
+                selectedType = null;
+                screenshotData = null;
+                analysisAnswers = new Array(10).fill("");
+                saveStudentData();
+                renderAnalysisView();
+            }
+        } else {
+            renderLoginScreen();
+        }
+    }
+    
+    init();
+</script>
+</body>
+</html>
